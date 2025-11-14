@@ -1,0 +1,1116 @@
+<!doctype html>
+<html lang="es">
+ <head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MenÃº Interactivo - Pancho-tito</title>
+  <script src="/_sdk/data_sdk.js"></script>
+  <script src="/_sdk/element_sdk.js"></script>
+  <style>
+        /* Estilos Generales */
+        body {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Inter', sans-serif;
+            background: #c62828; /* Rojo intenso */
+            min-height: 100vh;
+            color: #333;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+            padding: 30px;
+            background: #ffd54f; /* Amarillo fuerte */
+            border-radius: 20px;
+            box-shadow: 0 8px 32px rgba(255, 213, 79, 0.3);
+        }
+
+        .restaurant-name {
+            font-size: 3rem;
+            font-weight: 900;
+            color: #333;
+            margin: 0;
+        }
+
+        .restaurant-subtitle {
+            font-size: 1.2rem;
+            color: #333;
+            margin: 10px 0 0 0;
+        }
+
+        .menu-grid {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+
+        .menu-content {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .menu-section {
+            background: #fff9c4; /* Amarillo muy claro */
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+        }
+
+        .category-header {
+            font-size: 1.8rem;
+            font-weight: bold;
+            margin-bottom: 20px;
+            padding: 15px;
+            border-radius: 10px;
+            text-align: center;
+            color: #333;
+            text-shadow: none;
+        }
+
+        /* Colores de las secciones */
+        .panchos-comunes { background: #ffd54f; }
+        .panchos-dobles { background: #ff9800; }
+        .papas { background: #fff9c4; }
+        .bebidas { background: #FF9800; } 
+        .bebidas .category-header { background: #FFC107; }
+
+        .menu-item {
+            background: #fafafa;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 15px;
+            border-left: 5px solid;
+            transition: all 0.3s ease;
+        }
+
+        .menu-item:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 25px rgba(0,0,0,0.15);
+        }
+
+        .panchos-comunes .menu-item { border-left-color: #ffd54f; }
+        .panchos-dobles .menu-item { border-left-color: #e65100; }
+        .papas .menu-item { border-left-color: #ffd54f; }
+        .bebidas .menu-item { border-left-color: #e65100; }
+
+        .item-name {
+            font-size: 1.3rem;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 8px;
+        }
+
+        .item-description {
+            color: #666;
+            font-size: 0.95rem;
+            margin-bottom: 12px;
+            line-height: 1.4;
+        }
+
+        .price-options {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .price-btn {
+            background: #fff9c4;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            padding: 8px 12px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: center;
+            flex-grow: 1;
+            min-width: 120px;
+        }
+
+        .price-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 3px 10px rgba(0,0,0,0.2);
+            background: #fff8e1;
+            border-color: #c62828;
+            color: #c62828;
+        }
+
+        /* Orden y Carrito */
+        .order-section {
+            background: #fff9c4;
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+            position: sticky;
+            top: 20px;
+            max-height: 80vh;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        /* Asegura que el contenido (lista) ocupe el espacio sin que los botones se salgan */
+        #order-list {
+            min-height: 100px;
+            flex-grow: 1; 
+            overflow-y: auto; /* Scroll interno para la lista */
+            margin-bottom: 15px;
+            padding-right: 5px; /* PequeÃ±o espacio para la barra de desplazamiento */
+        }
+
+        .order-header {
+            font-size: 1.8rem;
+            font-weight: bold;
+            margin-bottom: 20px;
+            padding: 15px;
+            background: #ffd54f;
+            border-radius: 10px;
+            text-align: center;
+            color: #333;
+        }
+
+        .order-item {
+            background: #fafafa;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 10px;
+            border-left: 4px solid #c62828;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .order-item-name {
+            font-weight: bold;
+            color: #c62828;
+            margin-bottom: 5px;
+        }
+        
+        .order-item-details {
+            font-size: 0.9rem;
+            color: #555;
+            margin-bottom: 10px;
+        }
+        
+        .order-item-controls {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .quantity-controls {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .quantity-btn {
+            background: #eee;
+            border: 1px solid #ddd;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: background 0.2s;
+        }
+
+        .quantity-btn:hover {
+            background: #ffd54f;
+        }
+
+        .item-total {
+            font-weight: bold;
+            color: #4caf50;
+        }
+
+        .total-amount {
+            font-size: 1.3rem;
+            font-weight: bold;
+            text-align: right;
+            margin: 15px 0;
+            color: #c62828;
+        }
+        
+        .total-amount span {
+            color: #333;
+        }
+
+
+        /* Botones de acciÃ³n */
+        .make-order-btn {
+            background: linear-gradient(135deg, #4caf50, #45a049);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            padding: 15px 20px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            width: 100%;
+            margin-bottom: 10px;
+        }
+
+        .make-order-btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+
+        .clear-order-btn {
+            background: #f44336;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            padding: 12px 20px;
+            font-size: 1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            width: 100%;
+        }
+
+        /* --- ESTILOS PARA EL BANNER DE PEDIDO ENVIADO --- */
+        .order-sent-banner {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) scale(0);
+            /* Estilos mejorados */
+            background: linear-gradient(135deg, #4caf50 0%, #a5d6a7 100%); /* Degradado verde */
+            color: #333;
+            padding: 40px 60px;
+            border-radius: 25px;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5); /* Sombra mÃ¡s intensa */
+            text-align: center;
+            z-index: 3000;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+            border: 5px solid #fff;
+        }
+        
+        .order-sent-banner h2 {
+            font-size: 2.5rem;
+            font-weight: 900;
+            color: #fff;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+            margin-bottom: 10px;
+        }
+
+        .order-sent-banner p {
+            font-size: 1.1rem;
+            color: #f0f0f0;
+            margin: 0;
+        }
+
+        .order-sent-banner.show {
+            opacity: 1;
+            visibility: visible;
+            transform: translate(-50%, -50%) scale(1.1); /* Efecto de rebote mejorado */
+        }
+
+        .order-sent-banner .checkmark {
+            font-size: 4rem;
+            margin-bottom: 20px;
+            animation: pulse 1.5s infinite; /* Nuevo efecto de pulso */
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+        /* --- FIN ESTILOS BANNER --- */
+
+        /* Estilos de Modal */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 2000;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .modal-overlay.show {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .modal {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            max-width: 90%;
+            width: 500px;
+            max-height: 80vh;
+            overflow-y: auto;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            transform: scale(0.8);
+            transition: transform 0.3s ease;
+        }
+
+        .modal-overlay.show .modal {
+            transform: scale(1);
+        }
+        
+        .modal-buttons {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .modal-btn-confirm {
+            background: #4caf50;
+            color: white;
+            flex: 1;
+            padding: 12px 20px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .modal-btn-cancel {
+            background: #f44336;
+            color: white;
+            flex: 1;
+            padding: 12px 20px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        /* Estilos EspecÃ­ficos para la SelecciÃ³n de Pan */
+        .bread-option-card {
+            background: #f7f7f7;
+            border: 2px solid #ddd;
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 15px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .bread-option-card:hover {
+            background: #fff;
+            border-color: #ffd54f;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        }
+
+        .bread-option-card.selected {
+            border-color: #c62828;
+            background: #fff8e1;
+            box-shadow: 0 0 0 3px #ffd54f;
+        }
+
+        .bread-title {
+            font-weight: bold;
+            color: #c62828;
+            margin-bottom: 5px;
+        }
+
+        .bread-price {
+            font-size: 0.9rem;
+            color: #4caf50; 
+            font-weight: 600;
+        }
+
+        .bread-price.extra {
+            color: #e65100; 
+        }
+        
+        .summary-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px dashed #ddd;
+            font-size: 1.05rem;
+        }
+        
+        .summary-item-name {
+            font-weight: 500;
+            color: #333;
+        }
+        
+        .summary-item-price {
+            font-weight: bold;
+            color: #c62828;
+        }
+        
+        .summary-total {
+            margin-top: 20px;
+            padding-top: 10px;
+            border-top: 2px solid #ddd;
+            font-size: 1.5rem;
+            font-weight: bold;
+            text-align: right;
+            color: #333;
+        }
+        
+        .summary-total span {
+            color: #c62828;
+        }
+
+
+        /* Media Queries */
+        @media (max-width: 768px) {
+            .menu-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .restaurant-name {
+                font-size: 2.5rem;
+            }
+
+            .order-section {
+                position: static;
+                max-height: none;
+                margin-top: 20px;
+            }
+            
+            .price-options {
+                /* Asegura que los botones de tamaÃ±o se apilen en pantallas chicas */
+                flex-direction: column;
+                gap: 5px;
+            }
+            .price-btn {
+                min-width: unset;
+            }
+        }
+    </style>
+  <style>@view-transition { navigation: auto; }</style>
+  <script src="https://cdn.tailwindcss.com" type="text/javascript"></script>
+ </head>
+ <body>
+  <div class="container">
+   <header class="header">
+    <h1 class="restaurant-name" id="restaurant-name">Pancho-tito</h1>
+    <p class="restaurant-subtitle" id="restaurant-subtitle">Los mejores panchos de la ciudad</p>
+   </header>
+   <div class="menu-grid">
+    <div class="menu-content" id="menu-content">
+     <!-- ------------------ PANCHOS COMUNES ------------------ -->
+     <section class="menu-section panchos-comunes">
+      <h2 class="category-header">ðŸŒ­ Panchos</h2>
+      <p class="item-description text-center italic text-sm">Selecciona el pancho para elegir tu opciÃ³n de pan.</p>
+      <div class="menu-item">
+       <h3 class="item-name">Pancho Completo</h3>
+       <p class="item-description">Pan, salchicha, aderezos y papas fritas</p>
+       <div class="price-options">
+        <button class="price-btn pancho-select-btn" data-name="Pancho Completo" data-base-price="1600" data-size="Ãšnico">Seleccionar - $1.600</button>
+       </div>
+      </div>
+      <div class="menu-item">
+       <h3 class="item-name">Pancho Italiano</h3>
+       <p class="item-description">Pan, salchicha, palta, tomate y aderezos</p>
+       <div class="price-options">
+        <button class="price-btn pancho-select-btn" data-name="Pancho Italiano" data-base-price="1800" data-size="Ãšnico">Seleccionar - $1.800</button>
+       </div>
+      </div>
+      <div class="menu-item">
+       <h3 class="item-name">Pancho Americano</h3>
+       <p class="item-description">Pan, salchicha, bacon, cheddar, aderezos y papas</p>
+       <div class="price-options">
+        <button class="price-btn pancho-select-btn" data-name="Pancho Americano" data-base-price="1800" data-size="Ãšnico">Seleccionar - $1.800</button>
+       </div>
+      </div>
+      <div class="menu-item">
+       <h3 class="item-name">Pancho Veggie (Â¡Nuevo!)</h3>
+       <p class="item-description">Salchicha 100% a base de proteÃ­na vegetal. Servido con aderezos y complementos totalmente vegetarianos.</p>
+       <div class="price-options">
+        <button class="price-btn pancho-select-btn" data-name="Pancho Veggie" data-base-price="1700" data-size="Ãšnico">Seleccionar - $1.700</button>
+       </div>
+      </div>
+     </section>
+     <!-- ------------------ PANCHOS DOBLES ------------------ -->
+     <section class="menu-section panchos-dobles">
+      <h2 class="category-header">ðŸŒ­ðŸŒ­ Panchos Dobles</h2>
+      <p class="item-description text-center italic text-sm">Selecciona el pancho doble para elegir tu opciÃ³n de pan.</p>
+      <div class="menu-item">
+       <h3 class="item-name">Doble Completo</h3>
+       <p class="item-description">Pan, dos salchichas, aderezos y papas fritas</p>
+       <div class="price-options">
+        <button class="price-btn pancho-select-btn" data-name="Doble Completo" data-base-price="2200" data-size="Ãšnico">Seleccionar - $2.200</button>
+       </div>
+      </div>
+      <div class="menu-item">
+       <h3 class="item-name">Doble Italiano</h3>
+       <p class="item-description">Pan, dos salchichas, palta, tomate y aderezos</p>
+       <div class="price-options">
+        <button class="price-btn pancho-select-btn" data-name="Doble Italiano" data-base-price="2500" data-size="Ãšnico">Seleccionar - $2.500</button>
+       </div>
+      </div>
+      <div class="menu-item">
+       <h3 class="item-name">Doble Americano</h3>
+       <p class="item-description">Pan, dos salchichas, bacon, cheddar, aderezos y papas</p>
+       <div class="price-options">
+        <button class="price-btn pancho-select-btn" data-name="Doble Americano" data-base-price="2500" data-size="Ãšnico">Seleccionar - $2.500</button>
+       </div>
+      </div>
+      <!-- Pancho Veggie Doble Agregado -->
+      <div class="menu-item">
+       <h3 class="item-name">Doble Veggie (Â¡Nuevo!)</h3>
+       <p class="item-description">Dos salchichas 100% vegetales. Servido con aderezos y complementos totalmente vegetarianos.</p>
+       <div class="price-options">
+        <button class="price-btn pancho-select-btn" data-name="Doble Veggie" data-base-price="2300" data-size="Ãšnico">Seleccionar - $2.300</button>
+       </div>
+      </div>
+      <!-- Fin Pancho Veggie Doble -->
+     </section>
+     <!-- ------------------ PAPAS ------------------ -->
+     <section class="menu-section papas">
+      <h2 class="category-header">ðŸŸ Papas</h2>
+      <div class="menu-item">
+       <h3 class="item-name">Papas Fritas</h3>
+       <p class="item-description">Papas doradas y crujientes</p>
+       <div class="price-options">
+        <button class="price-btn" data-name="Papas Fritas" data-size="PequeÃ±a" data-price="1000">PequeÃ±a - $1.000</button>
+        <button class="price-btn" data-name="Papas Fritas" data-size="Mediana" data-price="1250">Mediana - $1.250</button>
+        <button class="price-btn" data-name="Papas Fritas" data-size="Grande" data-price="1500">Grande - $1.500</button>
+       </div>
+      </div>
+      <div class="menu-item">
+       <h3 class="item-name">Papas con Aderezo</h3>
+       <p class="item-description">Papas fritas con tu aderezo favorito</p>
+       <div class="price-options">
+        <!-- MAYO -->
+        <button class="price-btn" data-name="Papas con Mayo" data-size="PequeÃ±a" data-price="1200">PequeÃ±a Mayo - $1.200</button>
+        <button class="price-btn" data-name="Papas con Mayo" data-size="Mediana" data-price="1450">Mediana Mayo - $1.450</button>
+        <button class="price-btn" data-name="Papas con Mayo" data-size="Grande" data-price="1700">Grande Mayo - $1.700</button>
+        <!-- KETCHUP -->
+        <button class="price-btn" data-name="Papas con Ketchup" data-size="PequeÃ±a" data-price="1200">PequeÃ±a Ketchup - $1.200</button>
+        <button class="price-btn" data-name="Papas con Ketchup" data-size="Mediana" data-price="1450">Mediana Ketchup - $1.450</button>
+        <button class="price-btn" data-name="Papas con Ketchup" data-size="Grande" data-price="1700">Grande Ketchup - $1.700</button>
+        <!-- MOSTAZA -->
+        <button class="price-btn" data-name="Papas con Mostaza" data-size="PequeÃ±a" data-price="1200">PequeÃ±a Mostaza - $1.200</button>
+        <button class="price-btn" data-name="Papas con Mostaza" data-size="Mediana" data-price="1450">Mediana Mostaza - $1.450</button>
+        <button class="price-btn" data-name="Papas con Mostaza" data-size="Grande" data-price="1700">Grande Mostaza - $1.700</button>
+       </div>
+      </div>
+      <div class="menu-item">
+       <h3 class="item-name">Papas con Cheddar</h3>
+       <p class="item-description">Papas fritas cubiertas con queso cheddar derretido</p>
+       <div class="price-options">
+        <button class="price-btn" data-name="Papas con Cheddar" data-size="PequeÃ±a" data-price="1400">PequeÃ±a - $1.400</button>
+        <button class="price-btn" data-name="Papas con Cheddar" data-size="Mediana" data-price="1700">Mediana - $1.700</button>
+        <button class="price-btn" data-name="Papas con Cheddar" data-size="Grande" data-price="2000">Grande - $2.000</button>
+       </div>
+      </div>
+      <div class="menu-item">
+       <h3 class="item-name">Papas con Bacon</h3>
+       <p class="item-description">Papas fritas con trocitos de bacon crujiente</p>
+       <div class="price-options">
+        <button class="price-btn" data-name="Papas con Bacon" data-size="PequeÃ±a" data-price="1600">PequeÃ±a - $1.600</button>
+        <button class="price-btn" data-name="Papas con Bacon" data-size="Mediana" data-price="1900">Mediana - $1.900</button>
+        <button class="price-btn" data-name="Papas con Bacon" data-size="Grande" data-price="2200">Grande - $2.200</button>
+       </div>
+      </div>
+     </section>
+     <!-- ------------------ BEBIDAS ------------------ -->
+     <section class="menu-section bebidas">
+      <h2 class="category-header">ðŸ¥¤ Bebidas FrÃ­as</h2>
+      <!-- GASEOSAS - PRECIOS MANTENIDOS EN $900 -->
+      <div class="menu-item">
+       <h3 class="item-name">Gaseosas (Lata 355ml)</h3>
+       <p class="item-description">Coca-Cola, Fanta, Sprite o Pepsi</p>
+       <div class="price-options">
+        <button class="price-btn" data-name="Gaseosa Coca-Cola" data-size="Lata 355ml" data-price="900">Coca-Cola - $900</button>
+        <button class="price-btn" data-name="Gaseosa Fanta" data-size="Lata 355ml" data-price="900">Fanta - $900</button>
+        <button class="price-btn" data-name="Gaseosa Sprite" data-size="Lata 355ml" data-price="900">Sprite - $900</button>
+        <button class="price-btn" data-name="Gaseosa Pepsi" data-size="Lata 355ml" data-price="900">Pepsi - $900</button>
+       </div>
+      </div>
+      <!-- JUGOS NATURALES - PRECIOS ACTUALIZADOS A $1200 -->
+      <div class="menu-item">
+       <h3 class="item-name">Jugos Naturales</h3>
+       <p class="item-description">ReciÃ©n exprimidos, 500ml</p>
+       <div class="price-options">
+        <button class="price-btn" data-name="Jugo Natural Naranja" data-size="500ml" data-price="1200">Naranja - $1.200</button>
+        <button class="price-btn" data-name="Jugo Natural Frutilla" data-size="500ml" data-price="1200">Frutilla - $1.200</button>
+        <button class="price-btn" data-name="Jugo Natural Mango" data-size="500ml" data-price="1200">Mango - $1.200</button>
+        <button class="price-btn" data-name="Jugo Natural PiÃ±a" data-size="500ml" data-price="1200">PiÃ±a - $1.200</button>
+       </div>
+      </div>
+      <!-- AGUAS -->
+      <div class="menu-item">
+       <h3 class="item-name">Agua Mineral (500ml)</h3>
+       <p class="item-description">Elige tu opciÃ³n: con o sin gas</p>
+       <div class="price-options">
+        <button class="price-btn" data-name="Agua Mineral" data-size="Con Gas 500ml" data-price="700">Con Gas - $700</button>
+        <button class="price-btn" data-name="Agua Mineral" data-size="Sin Gas 500ml" data-price="650">Sin Gas - $650</button>
+       </div>
+      </div>
+      <!-- AGUAS SABORIZADAS - PRECIOS ACTUALIZADOS -->
+      <div class="menu-item">
+       <h3 class="item-name">Aguas Saborizadas (500ml)</h3>
+       <p class="item-description">Sabores frutales y refrescantes</p>
+       <div class="price-options">
+        <button class="price-btn" data-name="Agua Saborizada Aquarius" data-size="500ml" data-price="900">Aquarius - $900</button>
+        <button class="price-btn" data-name="Agua Saborizada Placer" data-size="500ml" data-price="700">Placer - $700</button>
+        <button class="price-btn" data-name="Agua Saborizada Levite" data-size="500ml" data-price="600">Levite - $600</button>
+        <button class="price-btn" data-name="Agua Saborizada Ser" data-size="500ml" data-price="600">Ser - $600</button>
+       </div>
+      </div>
+     </section>
+    </div>
+    <!-- ------------------ SECCIÃ“N DE PEDIDO ------------------ -->
+    <div class="order-section relative">
+     <div id="loading-overlay" class="loading-overlay">Cargando...</div>
+     <h2 class="order-header">ðŸ›’ Tu Pedido</h2>
+     <div id="order-list">
+      <div class="empty-order">AÃºn no hay productos en tu pedido.</div>
+     </div>
+     <!-- Bloque que contiene el total y los botones, esencial para el carrito -->
+     <div class="order-total">
+      <div class="total-amount">Total: <span id="total-amount">$0</span></div>
+      <button class="make-order-btn" id="make-order-btn" disabled>Hacer Pedido</button>
+      <button class="clear-order-btn" id="clear-order-btn" disabled>Vaciar Pedido</button>
+     </div>
+    </div>
+   </div>
+  </div>
+
+  <!-- Toast for adding items -->
+  <div id="toast" class="toast">Producto aÃ±adido al pedido.</div>
+
+  <!-- Bread Selection Modal (APARTADO DEL PAN) -->
+  <div id="bread-modal-overlay" class="modal-overlay">
+   <div class="modal">
+    <div class="modal-header">
+     <h3 class="modal-title text-2xl font-bold text-center mb-4 text-red-700">ðŸ¥– Elige el Tipo de Pan</h3>
+     <p class="modal-subtitle text-lg text-gray-600 text-center" id="pancho-name-display"></p>
+    </div>
+    <div id="bread-options-container">
+     
+     <div class="bread-option-card" data-bread-type="ClÃ¡sico" data-extra-cost="0">
+      <div class="bread-title">ðŸž Pan de Viena ClÃ¡sico</div>
+      <p class="bread-description text-gray-600 text-sm">El pan tradicional suave y esponjoso.</p>
+      <div class="bread-price">Â¡Incluido!</div>
+     </div>
+
+     <div class="bread-option-card" data-bread-type="Integral" data-extra-cost="300">
+      <div class="bread-title">ðŸŒ¾ Pan Integral</div>
+      <p class="bread-description text-gray-600 text-sm">OpciÃ³n con cereales y semillas, mÃ¡s saludable.</p>
+      <div class="bread-price extra">+ $300</div>
+     </div>
+
+     <!-- Pan Vegano/Sin TACC -->
+     <div class="bread-option-card" data-bread-type="Vegano/Sin TACC" data-extra-cost="0">
+      <div class="bread-title">ðŸŒ± Pan Vegano / Sin TACC</div>
+      <p class="bread-description text-gray-600 text-sm">OpciÃ³n 100% vegetal y libre de gluten.</p>
+      <div class="bread-price text-green-600">Â¡GRATIS!</div>
+     </div>
+     
+    </div>
+    <div class="modal-buttons">
+     <button class="modal-btn modal-btn-confirm" id="add-to-order-with-bread" disabled>AÃ±adir al Pedido</button>
+     <button class="modal-btn modal-btn-cancel" id="cancel-bread-selection">Cancelar</button>
+    </div>
+   </div>
+  </div>
+
+
+  <!-- Confirmation Modal -->
+  <div id="order-modal-overlay" class="modal-overlay">
+   <div class="modal">
+    <div class="modal-header">
+     <h3 class="modal-title text-2xl font-bold text-center mb-4 text-red-700">Confirmar Pedido</h3>
+     <p class="modal-subtitle text-gray-600 text-center">Revisa tu pedido antes de enviarlo.</p>
+    </div>
+    <div class="order-summary" id="modal-order-summary">
+     <!-- Summary will be rendered here -->
+    </div>
+    <div class="total-amount summary-total">Total a Pagar: <span id="modal-total-amount">$0</span></div>
+    <div class="modal-buttons">
+     <button class="modal-btn modal-btn-confirm" id="confirm-order-btn">Confirmar y Enviar</button>
+     <button class="modal-btn modal-btn-cancel" id="cancel-modal-btn">Cancelar</button>
+    </div>
+   </div>
+  </div>
+
+  <!-- Order Sent Banner (ESTÃ‰TICA MEJORADA) -->
+  <div id="order-sent-banner" class="order-sent-banner">
+   <div class="checkmark">âœ…</div>
+   <h2>Â¡Pedido Enviado!</h2>
+   <p id="banner-message">Tu orden estÃ¡ siendo preparada. Gracias por tu compra.</p>
+  </div>
+
+  <script type="module">
+    // Importaciones de Firebase
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+    import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+    import { getFirestore, collection, addDoc, serverTimestamp, setLogLevel } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+    setLogLevel('Debug');
+
+    let db;
+    let auth;
+    let userId = 'anonymous'; 
+    let order = []; // Estado global para el carrito
+    let tempPanchoConfig = null; // Para almacenar temporalmente el pancho antes de elegir el pan
+
+    // --- INICIALIZACIÃ“N DE FIREBASE Y AUTENTICACIÃ“N ---
+    const initFirebase = async () => {
+        try {
+            const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
+            const firebaseConfig = JSON.parse(typeof __firebase_config !== 'undefined' ? __firebase_config : '{}');
+
+            if (Object.keys(firebaseConfig).length === 0) {
+                console.error("Firebase config is missing.");
+                return;
+            }
+
+            const app = initializeApp(firebaseConfig);
+            db = getFirestore(app);
+            auth = getAuth(app);
+
+            const initialAuthToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
+            if (initialAuthToken) {
+                await signInWithCustomToken(auth, initialAuthToken);
+            } else {
+                await signInAnonymously(auth);
+            }
+
+            onAuthStateChanged(auth, (user) => {
+                if (user) {
+                    userId = user.uid;
+                    console.log("User ID ready:", userId);
+                } else {
+                    console.log("No user is signed in.");
+                }
+            });
+        } catch (error) {
+            console.error("Firebase Initialization or Auth failed:", error);
+        }
+    };
+
+    // --- AYUDANTES DE UI ---
+
+    // Formatea el precio usando el separador de miles (tÃ­pico de ARS: 1.500)
+    const formatPrice = (value) => `$${value.toLocaleString('es-AR')}`;
+
+    const showToast = (message) => {
+        const toastEl = document.getElementById('toast');
+        toastEl.textContent = message;
+        toastEl.classList.add('show');
+        setTimeout(() => {
+            toastEl.classList.remove('show');
+        }, 2000);
+    };
+
+    const showLoading = (show) => {
+        // Simple loading indicator logic here...
+        console.log("Loading state:", show);
+    };
+
+    // --- LÃ“GICA DEL CARRITO ---
+
+    const renderOrder = () => {
+        const listEl = document.getElementById('order-list');
+        const totalAmountEl = document.getElementById('total-amount');
+        const makeOrderBtn = document.getElementById('make-order-btn');
+        const clearOrderBtn = document.getElementById('clear-order-btn');
+
+        if (order.length === 0) {
+            listEl.innerHTML = '<div class="empty-order">AÃºn no hay productos en tu pedido.</div>';
+            totalAmountEl.textContent = formatPrice(0);
+            makeOrderBtn.disabled = true;
+            clearOrderBtn.disabled = true;
+            return;
+        }
+
+        let total = 0;
+        let html = '';
+
+        order.forEach((item, index) => {
+            const itemTotal = item.price * item.quantity;
+            total += itemTotal;
+
+            html += `
+                <div class="order-item">
+                    <div class="order-item-name">${item.name} <span class="text-xs text-gray-500">(${item.size})</span></div>
+                    <div class="order-item-details"></div>
+                    <div class="order-item-controls">
+                        <div class="quantity-controls">
+                            <button class="quantity-btn" data-index="${index}" data-delta="-1" aria-label="Disminuir cantidad">-</button>
+                            <span class="quantity-display">${item.quantity}</span>
+                            <button class="quantity-btn" data-index="${index}" data-delta="1" aria-label="Aumentar cantidad">+</button>
+                        </div>
+                        <div class="item-total">${formatPrice(itemTotal)}</div>
+                    </div>
+                </div>
+            `;
+        });
+
+        listEl.innerHTML = html;
+        totalAmountEl.textContent = formatOrder(total);
+        makeOrderBtn.disabled = false;
+        clearOrderBtn.disabled = false;
+    };
+
+    const addToOrder = (name, size, price) => {
+        // Encontrar si el artÃ­culo exacto (nombre + tamaÃ±o) ya existe
+        const existingItemIndex = order.findIndex(item => item.name === name && item.size === size);
+
+        if (existingItemIndex !== -1) {
+            // El artÃ­culo existe, solo aumentar la cantidad
+            order[existingItemIndex].quantity += 1;
+        } else {
+            // ArtÃ­culo nuevo, aÃ±adir al pedido
+            order.push({ name, size, price, quantity: 1 });
+        }
+
+        renderOrder();
+        showToast(`${name} (${size}) aÃ±adido.`);
+    };
+
+    const updateQuantity = (index, delta) => {
+        index = parseInt(index);
+        delta = parseInt(delta);
+
+        if (index >= 0 && index < order.length) {
+            order[index].quantity += delta;
+            
+            if (order[index].quantity <= 0) {
+                order.splice(index, 1);
+            }
+            
+            renderOrder();
+        }
+    };
+
+    const clearOrder = () => {
+        if (order.length > 0) {
+            order = [];
+            renderOrder();
+            showToast("Pedido vaciado.");
+        }
+    };
+
+    // --- LÃ“GICA DE SELECCIÃ“N DE PAN (NUEVA) ---
+
+    const openBreadSelection = (name, basePrice, size) => {
+        // Almacenar temporalmente los datos del pancho seleccionado
+        tempPanchoConfig = { name, basePrice: parseInt(basePrice), size };
+        
+        // Resetear la selecciÃ³n en el modal
+        document.querySelectorAll('#bread-options-container .bread-option-card').forEach(card => card.classList.remove('selected'));
+        document.getElementById('add-to-order-with-bread').disabled = true;
+
+        // Mostrar el nombre del pancho en el modal
+        document.getElementById('pancho-name-display').textContent = `EstÃ¡s configurando: ${name}`;
+
+        // Mostrar el modal
+        document.getElementById('bread-modal-overlay').classList.add('show');
+    };
+
+    const selectBreadAndFinalize = () => {
+        if (!tempPanchoConfig) return;
+
+        const selectedBreadEl = document.querySelector('#bread-options-container .bread-option-card.selected');
+        if (!selectedBreadEl) return;
+
+        const breadType = selectedBreadEl.dataset.breadType;
+        const extraCost = parseInt(selectedBreadEl.dataset.extraCost);
+
+        const finalName = `${tempPanchoConfig.name} c/ Pan ${breadType}`;
+        const finalPrice = tempPanchoConfig.basePrice + extraCost;
+        const finalSize = tempPanchoConfig.size; // Mantener el tamaÃ±o para consistencia
+
+        addToOrder(finalName, finalSize, finalPrice);
+
+        // Limpiar y cerrar el modal
+        document.getElementById('bread-modal-overlay').classList.remove('show');
+        tempPanchoConfig = null;
+    };
+
+    // --- MODAL Y FIREBASE (REUTILIZADOS) ---
+
+    const showOrderModal = () => {
+        const modalOverlayEl = document.getElementById('order-modal-overlay');
+        const summaryEl = document.getElementById('modal-order-summary');
+        const totalAmountEl = document.getElementById('modal-total-amount');
+
+        if (order.length === 0) return;
+
+        let total = 0;
+        let summaryHtml = '';
+
+        order.forEach(item => {
+            const itemTotal = item.price * item.quantity;
+            total += itemTotal;
+
+            summaryHtml += `
+                <div class="summary-item">
+                    <span class="summary-item-name">${item.quantity}x ${item.name}</span>
+                    <span class="summary-item-details"></span>
+                    <span class="summary-item-price">${formatPrice(itemTotal)}</span>
+                </div>
+            `;
+        });
+        
+        totalAmountEl.textContent = formatPrice(total);
+        summaryEl.innerHTML = summaryHtml;
+        modalOverlayEl.classList.add('show');
+    };
+
+    const hideOrderModal = () => {
+        document.getElementById('order-modal-overlay').classList.remove('show');
+    };
+
+    const confirmOrder = async () => {
+        hideOrderModal();
+        showLoading(true);
+
+        try {
+            const total = order.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+            const orderData = {
+                userId: userId,
+                items: order.map(item => ({
+                    name: item.name,
+                    size: item.size,
+                    price: item.price,
+                    quantity: item.quantity
+                })),
+                totalAmount: total,
+                status: 'Pendiente',
+                timestamp: serverTimestamp()
+            };
+
+            const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
+            // Ruta pÃºblica para pedidos, permitiendo visibilidad para la administraciÃ³n.
+            const ordersCollection = collection(db, `artifacts/${appId}/public/data/orders`); 
+
+            const docRef = await addDoc(ordersCollection, orderData);
+            console.log("Order submitted with ID: ", docRef.id);
+
+            order = [];
+            renderOrder();
+            showOrderSentBanner();
+
+        } catch (e) {
+            console.error("Error submitting order to Firestore: ", e);
+            showToast("Error al enviar el pedido. Intenta de nuevo.");
+        } finally {
+            showLoading(false);
+        }
+    };
+
+    const showOrderSentBanner = () => {
+        const bannerEl = document.getElementById('order-sent-banner');
+        // Mensaje limpio sin el resumen del pedido (como solicitaste)
+        document.getElementById('banner-message').textContent = "Tu orden estÃ¡ siendo preparada. Gracias por tu compra."; 
+        
+        bannerEl.classList.add('show');
+        setTimeout(() => {
+            bannerEl.classList.remove('show');
+        }, 3000);
+    };
+
+    // --- LISTENERS DE EVENTOS ---
+
+    const setupListeners = () => {
+        // 1. DelegaciÃ³n de eventos para el menÃº
+        document.getElementById('menu-content').addEventListener('click', (event) => {
+            const btn = event.target.closest('.price-btn');
+            if (btn) {
+                // Si es un Pancho, abrimos el modal de pan
+                if (btn.classList.contains('pancho-select-btn')) {
+                    const name = btn.dataset.name;
+                    const basePrice = btn.dataset.basePrice;
+                    const size = btn.dataset.size;
+                    openBreadSelection(name, basePrice, size);
+                } 
+                // Si es una Papa o una Bebida, se aÃ±ade directamente
+                else {
+                    const name = btn.dataset.name;
+                    const size = btn.dataset.size;
+                    const price = parseInt(btn.dataset.price);
+                    if (name && size && !isNaN(price)) {
+                        addToOrder(name, size, price);
+                    }
+                }
+            }
+        });
+
+        // 2. Controles de cantidad en el carrito
+        document.getElementById('order-list').addEventListener('click', (event) => {
+            const btn = event.target.closest('.quantity-btn');
+            if (btn) {
+                const index = btn.dataset.index;
+                const delta = btn.dataset.delta;
+                if (index !== undefined && delta !== undefined) {
+                    updateQuantity(index, delta);
+                }
+            }
+        });
+
+        // 3. LÃ³gica de Modal de Pan
+        const breadOptionsContainer = document.getElementById('bread-options-container');
+        breadOptionsContainer.addEventListener('click', (event) => {
+            const card = event.target.closest('.bread-option-card');
+            if (card) {
+                document.querySelectorAll('.bread-option-card').forEach(c => c.classList.remove('selected'));
+                card.classList.add('selected');
+                document.getElementById('add-to-order-with-bread').disabled = false;
+            }
+        });
+
+        document.getElementById('add-to-order-with-bread').addEventListener('click', selectBreadAndFinalize);
+        document.getElementById('cancel-bread-selection').addEventListener('click', () => {
+            document.getElementById('bread-modal-overlay').classList.remove('show');
+        });
+        document.getElementById('bread-modal-overlay').addEventListener('click', (e) => {
+            if (e.target.id === 'bread-modal-overlay') {
+                document.getElementById('bread-modal-overlay').classList.remove('show');
+            }
+        });
+
+
+        // 4. Botones de acciÃ³n principal y modal de pedido
+        document.getElementById('make-order-btn').addEventListener('click', showOrderModal);
+        document.getElementById('clear-order-btn').addEventListener('click', clearOrder);
+        document.getElementById('confirm-order-btn').addEventListener('click', confirmOrder);
+        document.getElementById('cancel-modal-btn').addEventListener('click', hideOrderModal);
+        document.getElementById('order-modal-overlay').addEventListener('click', (e) => {
+            if (e.target.id === 'order-modal-overlay') {
+                hideOrderModal();
+            }
+        });
+    };
+
+    // --- INICIALIZACIÃ“N ---
+    window.onload = async () => {
+        showLoading(true);
+        await initFirebase();
+        setupListeners();
+        renderOrder(); 
+        showLoading(false);
+    };
+
+  </script>
+ </body>
+</html>
